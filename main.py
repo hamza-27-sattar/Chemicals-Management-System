@@ -1,3 +1,5 @@
+import json
+
 class Chemical:
     def __init__(self,name,chemical_id,category,quantity,unit, expiry_date):
         self.name = name
@@ -17,9 +19,9 @@ class Chemical:
     +--------------------------------+
         ''')        
 
-chemical1 = Chemical("Hydrochloric Acid","CH001","Acid",500,"mL","2027-01")
-chemical2 = Chemical("Ethanol","CH002","Solvent",1000,"mL","2027-02")
-chemical3 = Chemical("Citric Acid","CH003","Acid",200,"mL","2027-03")
+chemical1 = Chemical("Hydrochloric Acid","001","Acid",500,"mL","01-2027")
+chemical2 = Chemical("Ethanol","002","Solvent",1000,"mL","02-2027")
+chemical3 = Chemical("Citric Acid","003","Acid",200,"mL","03-2027")
 
 
 class Inventory:
@@ -56,9 +58,115 @@ class Inventory:
                 break
         else:
             print("Could not find Chemical")
+    def find_by_name(self, name):
+        for chemical in self.chemicals:
+            if chemical.name.lower() == name.lower():
+                chemical.display()
+                break
+        else:
+            print("Chemical Not Found")
+    def update_category(self, chemical_id, new_category):
+        for chemical in self.chemicals:
+            if chemical.chemical_id == chemical_id:
+                chemical.category = new_category
+                print("Category Updated")
+                break
+        else:
+            print("Chemical Not Found")
+
+    def save(self):
+        data = []
+        for chemical in self.chemicals:
+            data.append({
+                "Name": chemical.name,
+                "Chemical ID": chemical.chemical_id,
+                "Category": chemical.category,
+                "Quantity": chemical.quantity,
+                "Unit": chemical.unit,
+                "Expiry Date": chemical.expiry_date
+            })
+        with open("chemicals.json", "w") as file:
+            json.dump(data, file, indent=4)
+
+        print("Inventory Saved!")
+
+    def load(self):
+        try:
+            with open("chemicals.json", "r") as file:
+                data = json.load(file)
+
+            for item in data:
+                chemical = Chemical(
+                item["Name"],
+                item["Chemical ID"],
+                item["Category"],
+                item["Quantity"],
+                item["Unit"],
+                item["Expiry Date"]
+            )
+
+                self.chemicals.append(chemical)
+
+            print("Inventory Loaded!")
+
+        except FileNotFoundError:
+            print("No saved inventory found.")
+    
 
 inventory = Inventory()
-inventory.add_chemical(chemical1)
-inventory.add_chemical(chemical2)
-inventory.add_chemical(chemical3)
+inventory.load()
+
+#def menu():
+while True:
+        print('''
+        +===================================+
+        |   Chemical Management System      |
+        |                                   |
+        | 1. Add Chemical                   |
+        | 2. Display all Chemicals          |
+        | 3. Find Chemical (ID)             |
+        | 4. Find Chemical (Name)           |
+        | 5. Update Quantity                |
+        | 6. Update Category                |
+        | 7. Remove Chemical                |
+        | 8. Exit                           |       
+        |                                   |
+        +===================================+
+        ''')
+
+        
+        choice = int(input("Enter choice: "))
+        if choice == 1:
+            name = input("Chemical name: ")
+            chemical_id = input("Chemical ID: ")   
+            category = input("Category: ")
+            quantity = int(input("Quantity: "))
+            unit = input("Unit: ")
+            expiry_date = input("Expiry date: ")
+            chemical = Chemical(name, chemical_id, category, quantity, unit, expiry_date)
+            inventory.add_chemical(chemical)
+            print("Chemical Added!")
+        if choice == 2:
+            inventory.display_all()
+        if choice == 3:
+            chemical_id = input("Enter Chemical ID: ")
+            inventory.find_chemical(chemical_id)
+        if choice == 4:
+            name = input("Enter Chemical Name: ")
+            inventory.find_by_name(name)
+        if choice == 5:
+            chemical_id = input("Enter Chemical ID: ")
+            new_quantity = int(input("Enter New Quantity: "))
+            inventory.update_quantity(chemical_id, new_quantity)
+        if choice == 6:
+            chemical_id = input("Enter Chemical ID: ")
+            new_category = input("Enter New Category: ")
+            inventory.update_category(chemical_id, new_category)
+        if choice == 7:
+            chemical_id = input("Enter Chemical ID: ")
+            inventory.remove_chemical(chemical_id)
+        if choice == 8:
+            inventory.save()
+            print("Goodbye!")
+            break
 
