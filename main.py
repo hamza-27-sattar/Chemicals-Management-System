@@ -1,4 +1,5 @@
 import json
+import matplotlib.pyplot as plt
 
 class Chemical:
     def __init__(self,name,chemical_id,category,quantity,unit, expiry_date):
@@ -111,6 +112,79 @@ class Inventory:
 
         except FileNotFoundError:
             print("No saved inventory found.")
+    def view_analytics(self):
+        fig, axes = plt.subplots(2, 2, figsize=(12, 8))
+
+        # -------------------------------
+        # 1. Chemicals by Category
+        # -------------------------------
+        category_counts = {}
+
+        for chemical in self.chemicals:
+            category = chemical.category
+
+            if category in category_counts:
+                category_counts[category] += 1
+            else:
+                category_counts[category] = 1
+
+        categories = list(category_counts.keys())
+        category_values = list(category_counts.values())
+
+        axes[0, 0].bar(categories, category_values)
+        axes[0, 0].set_title("Chemicals by Category")
+        axes[0, 0].set_xlabel("Category")
+        axes[0, 0].set_ylabel("Number of Chemicals")
+
+        # -------------------------------
+        # 2. Chemicals by Unit
+        # -------------------------------
+        unit_counts = {}
+
+        for chemical in self.chemicals:
+            unit = chemical.unit
+
+            if unit in unit_counts:
+                unit_counts[unit] += 1
+            else:
+                unit_counts[unit] = 1
+
+        units = list(unit_counts.keys())
+        unit_values = list(unit_counts.values())
+
+        axes[0, 1].pie(unit_values, labels=units, autopct="%1.1f%%")
+        axes[0, 1].set_title("Chemicals by Unit")
+
+
+        # -------------------------------
+        # 3. Expiry Overview
+        # -------------------------------
+        expiry_dates = []
+        expiry_names = []
+
+        for chemical in self.chemicals:
+            expiry_names.append(chemical.name)
+            expiry_dates.append(chemical.expiry_date)
+
+        axes[1, 0].bar(expiry_names, range(len(expiry_dates)))
+        axes[1, 0].set_title("Expiry Date Overview")
+        axes[1, 0].set_xlabel("Chemical")
+        axes[1, 0].set_ylabel("Expiry Entry")
+        axes[1, 0].tick_params(axis="x", rotation=45)
+
+
+        # -------------------------------
+        # 4. Total Chemicals
+        # -------------------------------
+        total_chemicals = len(self.chemicals)
+
+        axes[1, 1].bar(["Total Chemicals"], [total_chemicals])
+        axes[1, 1].set_title("Total Chemicals in Inventory")
+        axes[1, 1].set_ylabel("Number of Chemicals")
+
+
+        plt.tight_layout()
+        plt.show()
     
 
 inventory = Inventory()
@@ -129,7 +203,8 @@ while True:
         | 5. Update Quantity                |
         | 6. Update Category                |
         | 7. Remove Chemical                |
-        | 8. Exit                           |       
+        | 8. View Analytics                 |
+        | 9. Save and Exit                  |       
         |                                   |
         +===================================+
         ''')
@@ -166,7 +241,11 @@ while True:
             chemical_id = input("Enter Chemical ID: ")
             inventory.remove_chemical(chemical_id)
         if choice == 8:
+            inventory.view_analytics()
+        if choice == 9:
             inventory.save()
             print("Goodbye!")
             break
+
+
 
