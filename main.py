@@ -98,7 +98,11 @@ class Inventory:
             print("Could not find Chemical")
 # View Analytics Option 8
     def view_analytics(self):
-        fig, axes = plt.subplots(2, 2, figsize=(12, 8))
+        fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+        
+        # Professional color palette for charts
+        palette = ['#3498db', '#2ecc71', '#e74c3c', '#9b59b6', '#f39c12']
+
         # 1. Chemicals by Category
         category_counts = {}
         for chemical in self.chemicals:
@@ -109,10 +113,11 @@ class Inventory:
                 category_counts[category] = 1
         categories = list(category_counts.keys())
         category_values = list(category_counts.values())
-        axes[0, 0].bar(categories, category_values)
-        axes[0, 0].set_title("Chemicals by Category")
-        axes[0, 0].set_xlabel("Category")
-        axes[0, 0].set_ylabel("Number of Chemicals")
+        axes[0].bar(categories, category_values, color=palette[:len(categories)], edgecolor='black', alpha=0.85)
+        axes[0].set_title("Chemicals by Category", fontsize=12, fontweight='bold')
+        axes[0].set_xlabel("Category", fontsize=10)
+        axes[0].set_ylabel("Number of Chemicals", fontsize=10)
+        axes[0].grid(axis='y', linestyle='--', alpha=0.6)  
         # 2. Chemicals by Unit
         unit_counts = {}
         for chemical in self.chemicals:
@@ -123,24 +128,15 @@ class Inventory:
                 unit_counts[unit] = 1
         units = list(unit_counts.keys())
         unit_values = list(unit_counts.values())
-        axes[0, 1].pie(unit_values, labels=units, autopct="%1.1f%%")
-        axes[0, 1].set_title("Chemicals by Unit")
-        # 3. Expiry Overview
-        expiry_dates = []
-        expiry_names = []
-        for chemical in self.chemicals:
-            expiry_names.append(chemical.name)
-            expiry_dates.append(chemical.expiry_date)
-        axes[1, 0].bar(expiry_names, range(len(expiry_dates)))
-        axes[1, 0].set_title("Expiry Date Overview")
-        axes[1, 0].set_xlabel("Chemical")
-        axes[1, 0].set_ylabel("Expiry Entry")
-        axes[1, 0].tick_params(axis="x", rotation=45)
-        # 4. Total Chemicals
-        total_chemicals = len(self.chemicals)
-        axes[1, 1].bar(["Total Chemicals"], [total_chemicals])
-        axes[1, 1].set_title("Total Chemicals in Inventory")
-        axes[1, 1].set_ylabel("Number of Chemicals")
+        axes[1].pie(
+            unit_values, 
+            labels=units, 
+            autopct="%1.1f%%", 
+            colors=palette[:len(units)], 
+            startangle=140,
+            wedgeprops={'edgecolor': 'black', 'linewidth': 0.8}
+        )
+        axes[1].set_title("Chemicals by Unit", fontsize=12, fontweight='bold')
         plt.tight_layout()
         plt.show()
 # Saving all stored data before exiting menu Option 9
@@ -162,6 +158,7 @@ class Inventory:
 
 inventory = Inventory()
 inventory.load()
+# Main Menu (Looped)
 while True:
         print('''
         +===================================+
@@ -179,6 +176,7 @@ while True:
         |                                   |
         +===================================+
         ''')
+        # Options within Main Menu
         choice = int(input("Enter choice: "))
         if choice == 1:
             name = input("Chemical name: ")
@@ -190,31 +188,32 @@ while True:
             chemical = Chemical(name, chemical_id, category, quantity, unit, expiry_date)
             inventory.add_chemical(chemical)
             print("Chemical Added!")
-        if choice == 2:
+        elif choice == 2:
             inventory.display_all()
-        if choice == 3:
+        elif choice == 3:
             chemical_id = input("Enter Chemical ID: ")
             inventory.find_chemical(chemical_id)
-        if choice == 4:
+        elif choice == 4:
             name = input("Enter Chemical Name: ")
             inventory.find_by_name(name)
-        if choice == 5:
+        elif choice == 5:
             chemical_id = input("Enter Chemical ID: ")
             new_quantity = int(input("Enter New Quantity: "))
             inventory.update_quantity(chemical_id, new_quantity)
-        if choice == 6:
+        elif choice == 6:
             chemical_id = input("Enter Chemical ID: ")
             new_category = input("Enter New Category: ")
             inventory.update_category(chemical_id, new_category)
-        if choice == 7:
+        elif choice == 7:
             chemical_id = input("Enter Chemical ID: ")
             inventory.remove_chemical(chemical_id)
-        if choice == 8:
+        elif choice == 8:
             inventory.view_analytics()
-        if choice == 9:
+        elif choice == 9:
             inventory.save()
             print("Goodbye!")
             break
-
+        else:
+            print("Wrong Option!")
 
 
