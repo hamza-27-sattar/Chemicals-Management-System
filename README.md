@@ -21,11 +21,3 @@ A lightweight, object-oriented command-line inventory tracker built in Python. D
   * `json` (Built-in for file I/O)
   * `matplotlib` (For generating analytics charts)
 
----
-
-## 🚀 How to Run It
-
-1. **Clone the repository:**
-   ```bash
-   git clone [https://github.com/YOUR-USERNAME/chemical-management-system.git](https://github.com/YOUR-USERNAME/chemical-management-system.git)
-   cd chemical-management-system
